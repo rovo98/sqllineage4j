@@ -16,6 +16,10 @@
 
 grammar SqlBase;
 
+options {
+ caseInsensitive = true;
+}
+
 @parser::members {
   /**
    * When false, INTERSECT is given the greater precedence over the other set
