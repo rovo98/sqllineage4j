@@ -16,9 +16,15 @@ public class LineageRunner {
     public static final class Builder {
         private final String sql;
         private boolean verbose = false;
+        private List<String> splitStatements;
 
         private Builder(final String sql) {
             this.sql = sql;
+        }
+
+        public Builder splitStatements(List<String> splitStatements) {
+            this.splitStatements = splitStatements;
+            return this;
         }
 
         public Builder verbose() {
@@ -44,7 +50,11 @@ public class LineageRunner {
     private LineageRunner(final Builder builder) {
         String sql = builder.sql;
         this.verbose = builder.verbose;
-        statements = new StatementSplitter(sql).split();
+        if (builder.splitStatements != null && !builder.splitStatements.isEmpty()) {
+            statements = builder.splitStatements;
+        } else {
+            statements = new StatementSplitter(sql).split();
+        }
         statementLineageHolders = statements.stream().map(x -> new LineageAnalyzer().analyze(LineageParser.parse(x))).collect(Collectors.toList());
         sqlLineageHolder = SQLLineageHolder.of(statementLineageHolders.toArray(StatementLineageHolder[]::new));
     }
